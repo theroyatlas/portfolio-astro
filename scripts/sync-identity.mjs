@@ -2,7 +2,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve,join,dirname} from 'node:path';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
-const repo='RoyWG925/builder-context',digest=s=>createHash('sha256').update(s).digest('hex');
+const repo='theroyatlas/builder-context',digest=s=>createHash('sha256').update(s).digest('hex');
 const targets={'generated/public.json':['src/data/identity.json','public/identity.json'],'generated/resume.html':['public/resume.html'],'AI_CONTEXT.md':['public/ai-context.md'],'generated/introductions.md':['public/introductions.md']};
 export async function verifySnapshot(root){
   const receipt=JSON.parse(await readFile(join(root,'public/identity-source.json'),'utf8'));
@@ -20,13 +20,13 @@ export async function syncIdentity({root=fileURLToPath(new URL('../',import.meta
   const bundle=JSON.parse(contents.get('generated/public.json')),{revision,...payload}=bundle;
   if(bundle.schemaVersion!==1||digest(JSON.stringify(payload))!==revision||manifest.revision!==revision)throw Error('Bundle content revision mismatch');
   const accepted=['owner-confirmed','published-baseline','owner-attested'];
-  if(bundle.profile?.github!=='RoyWG925'||[bundle.profile,...bundle.projects,...bundle.competitions].some(p=>p.visibility!=='public'||!accepted.includes(p.review?.state))||bundle.evidence.some(e=>e.visibility!=='public'))throw Error('Private or proposed material rejected');
+  if(bundle.profile?.github!=='theroyatlas'||[bundle.profile,...bundle.projects,...bundle.competitions].some(p=>p.visibility!=='public'||!accepted.includes(p.review?.state))||bundle.evidence.some(e=>e.visibility!=='public'))throw Error('Private or proposed material rejected');
   if(!contents.get('generated/resume.html').includes(revision)||!contents.get('AI_CONTEXT.md').includes(revision))throw Error('Mixed export revisions');
   async function put(path,value){await mkdir(dirname(join(root,path)),{recursive:true});await writeFile(join(root,path),value);}
   for(const [source,paths]of Object.entries(targets))for(const path of paths)await put(path,contents.get(source));
   const receipt={repository:repo,commit:sha??'isolated-fixture',revision,files:manifest.files};
   await put('public/identity-source.json',JSON.stringify(receipt,null,2)+'\n');
-  await put('public/llms.txt',`# Roy Wang\nContext: https://roywg925.github.io/portfolio-astro/ai-context.md\nFacts: https://roywg925.github.io/portfolio-astro/identity.json\nIntroductions: https://roywg925.github.io/portfolio-astro/introductions.md\nCanonical: https://github.com/${repo}\nRevision: ${revision}\nNew facts require Roy’s personal review. No inferred awards, roles or traction.\n`);
+  await put('public/llms.txt',`# Roy Wang\nContext: https://theroyatlas.github.io/portfolio-astro/ai-context.md\nFacts: https://theroyatlas.github.io/portfolio-astro/identity.json\nIntroductions: https://theroyatlas.github.io/portfolio-astro/introductions.md\nCanonical: https://github.com/${repo}\nRevision: ${revision}\nNew facts require Roy’s personal review. No inferred awards, roles or traction.\n`);
   return receipt;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)console.log(await syncIdentity());
