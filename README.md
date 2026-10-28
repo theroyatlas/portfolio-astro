@@ -2,7 +2,7 @@
 
 Personal site for Roy Wang, a product-minded engineer building AI-powered tools and interactive web apps.
 
-**Live:** https://roywg925.github.io/portfolio-astro/
+**Live:** https://theroyatlas.github.io/portfolio-astro/
 
 ## Tech
 
